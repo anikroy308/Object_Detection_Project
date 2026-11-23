@@ -75,6 +75,19 @@ Make sure your camera is connected and accessible to the system.
 
 ## Limitations
 - Detection performance depends on camera quality, lighting, and visibility.
+
+
+## Engineering Considerations
+
+### 1. Scaling from One Camera to 500 Cameras
+To scale the system to 500 cameras, I would use a distributed architecture with independent camera-processing workers, message queues, and centralized monitoring. Each camera stream could be processed independently, allowing workloads to be distributed across multiple machines or GPUs. The system would likely encounter bottlenecks first in video decoding, GPU processing capacity, network bandwidth, and latency.
+
+### 2. Preventing Double Counting and Track Loss
+To reduce double-counting, I use unique tracking IDs, line-crossing direction checks, and cooldown logic to avoid counting the same crossing repeatedly. If a person temporarily leaves the camera view, tracking may be lost, and the person could be assigned a new ID upon re-entry. In a larger system, appearance-based re-identification and tracking across camera zones could help reduce this issue.
+
+### 3. Handling Blurry or Poor-Quality Camera Feeds
+I would monitor frame quality using indicators such as blur, brightness, and detection confidence. If a frame is temporarily poor, I would skip unreliable detections while maintaining the last known tracking state for a limited period. If the feed remains degraded, I would flag the camera as unhealthy rather than silently reporting inaccurate occupancy.
+
 - Occupancy estimates may not always reflect the actual number of people.
 - Camera availability and performance depend on the hardware and configuration.
 - Posture estimation is approximate and based on visual detection geometry.
